@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSHealthPro - Rekisteröidy</title>
+</head>
+<body>
+    <h1>Rekisteröidy</h1>
+    {% if message %}
+    <p>{{ message }}</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('auth.register') }}">
+        <input type="text" name="username" placeholder="Käyttäjätunnus" required>
+        <input type="password" name="password" placeholder="Salasana" required>
+        <button type="submit">Rekisteröidy</button>
+        {% if message %}<p>{{ message }}</p>{% endif %}
+    </form>
+    <p>Onko sinulla jo tunnus? <a href="{{ url_for('auth.login') }}">Kirjaudu tästä</a></p>
+</body>
+</html>
