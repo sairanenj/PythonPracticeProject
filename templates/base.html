@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}JSHealthPro{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="layout">
+        <nav class="sidebar">
+            <div class="top">
+                <div class="logo">
+                    JSHealthPro
+                </div>
+                <div class="modules">
+                  {% if session.user_id %}
+                  <!-- Esimerkkimoduulit!!! Väliaikaiset -->
+                  <a href="#">Moduuli 1</a>
+                  <a href="#">Moduuli 2</a>
+                  <a href="#">Moduuli 3</a>
+                  <a href="{{ url_for('eating1') }}">Ruokailu</a>
+                  {% endif %}
+                </div>
+            </div>
+                {% if session.user_id %}
+                    <form action="{{ url_for('auth.logout') }}" method="post">
+                        <button type="submit" class="logout-btn">Kirjaudu ulos</button>
+                    </form>
+                {% endif %}
+        </nav>
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

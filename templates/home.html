@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSHealthPro - Tervetuloa</title>
-</head>
-<body>
-  <h1>Tämä on kotisivu, olet onnistunut kirjautumaan sisään</h1>
+{% extends "base.html" %}
 
-  <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
-    <button type="submit">Kirjaudu ulos</button>
-  </form>
-</body>
-</html>
+{% block title %}Koti - JSHealthPro{% endblock %}
+
+{% block content %}
+    <h1>Tervetuloa kotisivulle!</h1>
+    <p>Tämä on suojattu sivu. Lisää sisältöä tähän.</p>
+{% endblock %}

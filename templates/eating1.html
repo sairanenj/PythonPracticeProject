@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Ruoka - JSHealthPro{% endblock %}
+
+{% block content %}
+<button onclick="window.location.href='/eating2'">Ruoka-aineet</button>
+<h1>Päivän ruokailut</h1>
+<div id="mealsPage" class="toggle-page">
+    <button id="addMealBtn" type="button">Lisää ruokailu</button>
+    <div id="mealsContainer"></div>
+</div>
+
+<script>
+
+    function createMealCard() {
+        const mealCard = document.createElement('div');
+        mealCard.className = 'meal-card';
+
+        // Luo taulukko
+        const table = document.createElement('table');
+        table.className = 'meal-table';
+        const tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+
+        // Lisää ensimmäinen rivi
+        function addRow() {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>
+                <select>
+                    <option value="">Valitse ruoka-aine</option>
+                    <option value="1">Peruna (keitetty)</option>
+                    <option value="2">Riisi</option>
+                    <option value="3">Kana</option>
+                </select>
+            </td>
+            <td><input type="number" placeholder="Määrä (g)" min="0"></td>
+            <td style="text-align:center;"><input type="checkbox" title="Valmis"></td>
+        `;
+            tbody.appendChild(row);
+        }
+        addRow();
+
+
+        const addRowBtn = document.createElement('button');
+        addRowBtn.type = 'button';
+        addRowBtn.className = 'addRowBtn';
+        addRowBtn.title = 'Lisää rivi';
+        addRowBtn.textContent = '+';
+        addRowBtn.onclick = addRow;
+
+        mealCard.appendChild(table);
+        mealCard.appendChild(addRowBtn);
+
+        return mealCard;
+    }
+
+    document.getElementById('addMealBtn').onclick = function () {
+        document.getElementById('mealsContainer').appendChild(createMealCard());
+    };
+</script>
+{% endblock %}

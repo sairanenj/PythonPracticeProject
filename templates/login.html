@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSHealthPro - Kirjaudu sisään</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Kirjaudu sisään - JSHealthPro{% endblock %}
+
+{% block content %}
     <h1>Kirjaudu sisään</h1>
     {% if message %}
-    <p>{{ message }}</p>
+        <div style="color: red;">{{ message }}</div>
     {% endif %}
-    <form method="post" action="{{ url_for('auth.login') }}">
-        <input type="text" name="username" placeholder="Käyttäjätunnus" required>
-        <input type="password" name="password" placeholder="Salasana" required>
+    <form method="post">
+        <label for="username">Käyttäjätunnus:</label><br>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Salasana:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
         <button type="submit">Kirjaudu</button>
-        {% if message %}<p>{{ message }}</p>{% endif %}
     </form>
-    <p>Ei tunnusta? <a href="{{ url_for('auth.register') }}">Rekisteröidy tästä</a></p>
-</body>
-</html>
+    <p>Ei vielä tiliä? <a href="{{ url_for('auth.register') }}">Rekisteröidy</a></p>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Ruoka - JSHealthPro{% endblock %}
+
+{% block content %}
+<button onclick="window.location.href='/eating1'">Päivän ruokailut</button>
+
+<div>
+    <h2>Lisää ruoka-aine (100g)</h2>
+    <form id="foodForm">
+        <input type="text" placeholder="Ruoka-aine" required>
+        <input type="number" placeholder="Rasva (g)" min="0" step="any" required>
+        <input type="number" placeholder="Proteiini (g)" min="0" step="any" required>
+        <input type="number" placeholder="Hiilihydraatti (g)" min="0" step="any" required>
+        <input type="number" placeholder="Energia (kcal)" min="0" step="any" required>
+        <button type="submit">Lisää</button>
+    </form>
+    <h3>Lisätyt ruoka-aineet (100g)</h3>
+    <table class="meal-table">
+        <thead>
+            <tr>
+                {% for field in fields %}
+                <th>{{ field.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in entries %}
+            <tr>
+                {% for field in fields %}
+                <td>{{ item.values_dict.get(field.id, "") }}</td>
+                {% endfor %}
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="{{ fields|length }}">Ei lisättyjä ruoka-aineita.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,30 +1,11 @@
-<!DOCTYPE html>
-<html lang="fi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSHealthPro</title>
-</head>
-<body>
-    <h1>Tervetuloa!</h1>
-    {% with messages = get_flashed_messages() %}
-    {% if messages and not session.user_id %}
-    {% for message in messages %}
-    <p>{{ message }}</p>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+{% extends "base.html" %}
+
+{% block title %}Tervetuloa - JSHealthPro{% endblock %}
+
+{% block content %}
+    <h1>Tervetuloa JSHealthPro-sovellukseen!</h1>
     <p>
-      {% if session.user_id %}
-        Tervetuloa, {{ session.username }}!
-        <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
-          <button type="submit">Kirjaudu ulos</button>
-        </form>
-      {% else %}
         <a href="{{ url_for('auth.login') }}">Kirjaudu sisään</a> |
         <a href="{{ url_for('auth.register') }}">Rekisteröidy</a>
-      {% endif %}
     </p>
-    <p>Voit palata takaisin aloitussivulle <a href="/">tästä linkistä</a>.</p>
-  </body>
-</html>
+{% endblock %}
