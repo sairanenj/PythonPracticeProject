@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template
 from services.module_service import find_module, list_fields_for_module
 
-module_bp = Blueprint("module", __name__)  # Module Blueprint
+module_bp = Blueprint("module", __name__)
 
-# @module_bp.route("/eating", methods=["GET"])  # Route for the eating module
+# @module_bp.route("/eating", methods=["GET"])  # Reitti ruokailumoduulille
 # def get_eating_module_and_fields():
 #     module = find_module(1)
 #     if not module:

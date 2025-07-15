@@ -7,12 +7,15 @@
 
 <div>
     <h2>Lisää ruoka-aine (100g)</h2>
-    <form id="foodForm">
-        <input type="text" placeholder="Ruoka-aine" required>
-        <input type="number" placeholder="Rasva (g)" min="0" step="any" required>
-        <input type="number" placeholder="Proteiini (g)" min="0" step="any" required>
-        <input type="number" placeholder="Hiilihydraatti (g)" min="0" step="any" required>
-        <input type="number" placeholder="Energia (kcal)" min="0" step="any" required>
+    <form id="foodForm" method="POST">
+        {% for field in fields %}
+            <input type="hidden" name="field_id" value="{{ field.id }}">
+        {% if field.field_type == "text" %}
+            <input type="text" name="value" placeholder="{{ field.name }}" required>
+        {% else %}
+            <input type="number" name="value" placeholder="{{ field.name }}" min="0" step="any" required>
+        {% endif %}
+        {% endfor %}
         <button type="submit">Lisää</button>
     </form>
     <h3>Lisätyt ruoka-aineet (100g)</h3>

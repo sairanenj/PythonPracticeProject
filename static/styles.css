@@ -84,15 +84,6 @@ body {
 
 /* EATING / MEAL MODULE */
 
-.meal-card {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    padding: 1rem;
-    margin-top: 1.5rem;
-    max-width: 600px;
-    position: relative;
-}
 .meal-table {
     width: 100%;
     border-collapse: collapse;
@@ -111,22 +102,7 @@ body {
 .meal-table input[type="checkbox"] {
     transform: scale(1.3);
 }
-.addRowBtn {
-    display: block;
-    margin: 1rem auto 0 auto;
-    background: #2d3a4b;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1.2rem;
-    width: 2rem;
-    height: 2rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.addRowBtn:hover {
-    background: #3e4c61;
-}
+
 #foodForm input, #foodForm button {
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;

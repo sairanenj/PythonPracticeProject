@@ -27,6 +27,7 @@ class Module_field(db.Model):
     field_type = db.Column(db.String(100), nullable=False)
     formula = db.Column(db.Text, nullable=True)
     order_index = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.String(100), nullable=True)
 
 class Entry(db.Model):
     __tablename__ = 'entries'

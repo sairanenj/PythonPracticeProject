@@ -15,11 +15,8 @@
                 </div>
                 <div class="modules">
                   {% if session.user_id %}
-                  <!-- Esimerkkimoduulit!!! Väliaikaiset -->
-                  <a href="#">Moduuli 1</a>
-                  <a href="#">Moduuli 2</a>
-                  <a href="#">Moduuli 3</a>
-                  <a href="{{ url_for('eating1') }}">Ruokailu</a>
+                  <a href="{{ url_for('entry.eating1_view') }}">Ruokailu</a>
+                  <a href="{{ url_for('gym') }}">Kuntosali</a>
                   {% endif %}
                 </div>
             </div>

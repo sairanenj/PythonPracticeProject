@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Kuntosali - JSHealthPro{% endblock %}
+
+{% block content %}
+<h1>Kuntosaliavustin</h1>
+<div style="display: flex; gap: 2rem;">
+  <div style="flex: 1; min-width: 350px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <h3 style="margin: 0;">Kuntosaliohjelma</h3>
+    </div>
+    <ol style="list-style: none; padding: 0;">
+      {% for entry in gym_program %}
+      <li style="border: 1px solid #ccc; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background: #fafbfc;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <strong>{{ entry.name }} ({{ entry.category|capitalize }})</strong>
+          <button type="button">Poista ohjelmasta</button>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          <label>Paino: <input type="number" value="{{ entry.weight }}" min="0" step="any" style="width:60px;"
+              disabled></label>
+          <label>Sarjat: <input type="number" value="{{ entry.sets }}" min="1" step="1" style="width:40px;"
+              disabled></label>
+          <label>Toistot: <input type="number" value="{{ entry.reps }}" min="1" step="1" style="width:40px;"
+              disabled></label>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          <label>Muistiinpanot: <input type="text" value="{{ entry.info }}" style="width: 200px;" disabled></label>
+          <button type="button" style="margin-left: 10px;" disabled>Tallenna</button>
+        </div>
+      </li>
+      {% else %}
+      <li><em>Ei liikkeitä ohjelmassa</em></li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  <div style="margin-left: 2rem;">
+    {% for category, exercises in exercises_by_category.items() %}
+    <div>
+      <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+        {{ category|capitalize }}
+        <button type="button">Lisää</button>
+      </h3>
+      <ul>
+        {% for exercise in exercises %}
+        <li>
+          <form method="post" action="{{ url_for('entry.add_gym_exercise') }}" style="display:inline;">
+            {{ exercise }}
+            <input type="hidden" name="exercise_name" value="{{ exercise }}">
+            <input type="hidden" name="category" value="{{ category }}">
+            <input type="hidden" name="weight" value="0">
+            <input type="hidden" name="sets" value="0">
+            <input type="hidden" name="reps" value="0">
+            <input type="hidden" name="info" value="empty">
+            <button type="submit" style="margin-left: 0.5rem;">+</button>
+          </form>
+        </li>
+        {% else %}
+        <li><em>Ei liikkeitä</em></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

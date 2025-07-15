@@ -5,6 +5,10 @@ from repositories.entry_repository import (
     get_entry_values,
     update_entry_values,
     delete_entry,
+    get_name_field_for_category,
+    get_exercise_names_for_field,
+    create_gym_entry,
+    get_gym_program_entries
 )
 
 # Lisää uusi merkintä moduuliin
@@ -30,3 +34,20 @@ def edit_entry(entry_id, field_value_dict):
 # Poista merkintä
 def remove_entry(entry_id):
     delete_entry(entry_id)
+
+def list_gym_exercises_by_category(gym_module_id, categories, user_id):
+    exercises_by_category = {}
+    for category in categories:
+        name_field = get_name_field_for_category(gym_module_id, category)
+        if not name_field:
+            exercises_by_category[category] = []
+            continue
+        # Hae vain user_id:lle kuuluvat liikkeet
+        exercises_by_category[category] = get_exercise_names_for_field(name_field.id, user_id)
+    return exercises_by_category
+
+def add_gym_exercise_to_program(module_id, user_id, exercise_name, category, weight, sets, reps, info):
+    return create_gym_entry(module_id, user_id, exercise_name, category, weight, sets, reps, info)
+
+def list_gym_program_entries(module_id, user_id):
+    return get_gym_program_entries(module_id, user_id)

@@ -5,58 +5,64 @@
 {% block content %}
 <button onclick="window.location.href='/eating2'">Ruoka-aineet</button>
 <h1>Päivän ruokailut</h1>
-<div id="mealsPage" class="toggle-page">
-    <button id="addMealBtn" type="button">Lisää ruokailu</button>
-    <div id="mealsContainer"></div>
-</div>
 
-<script>
+<form method="POST" style="margin-bottom: 2rem;">
+    <label for="foodSelect">Ruoka-aine:</label>
+    <select id="foodSelect" name="food_entry_id" required>
+        <option value="">Valitse</option>
+        {% for food in foods %}
+        <option value="{{ food.id }}">{{ food.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="number" name="amount" placeholder="Määrä (g)" min="1" required>
+    <br><br>
+    <button type="submit">Lisää päivän ruokailuun</button>
+</form>
 
-    function createMealCard() {
-        const mealCard = document.createElement('div');
-        mealCard.className = 'meal-card';
+<table class="meal-table">
+    <thead>
+        <tr>
+            <th>Ruoka-aine</th>
+            <th>Määrä (g)</th>
+            <th>Rasva (g)</th>
+            <th>Proteiini (g)</th>
+            <th>Hiilihydraatti (g)</th>
+            <th>Energia (kcal)</th>
+            <th>Syöty</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for meal in meal_rows %}
+        <tr>
+            <td>{{ meal.name }}</td>
+            <td>{{ meal.amount }}</td>
+            <td>{{ meal.fat|round(2) }}</td>
+            <td>{{ meal.protein|round(2) }}</td>
+            <td>{{ meal.carb|round(2) }}</td>
+            <td>{{ meal.energy|round(1) }}</td>
+            <td style="text-align: center;"><input type="checkbox"></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">Ei lisättyjä ruoka-aineita.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr style="background: #e0e0e0; font-weight: bold;">
+            <th>Yhteensä</th>
+            <td>{{ total_amount }}</td>
+            <td style="background: #ffe066;">{{ total_fat|round(2) }}</td>
+            <td style="background: #b6fcb6;">{{ total_protein|round(2) }}</td>
+            <td style="background: #ffd6d6;">{{ total_carb|round(2) }}</td>
+            <td style="background: #d6f0ff;">{{ total_energy|round(1) }}</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
 
-        // Luo taulukko
-        const table = document.createElement('table');
-        table.className = 'meal-table';
-        const tbody = document.createElement('tbody');
-        table.appendChild(tbody);
-
-        // Lisää ensimmäinen rivi
-        function addRow() {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>
-                <select>
-                    <option value="">Valitse ruoka-aine</option>
-                    <option value="1">Peruna (keitetty)</option>
-                    <option value="2">Riisi</option>
-                    <option value="3">Kana</option>
-                </select>
-            </td>
-            <td><input type="number" placeholder="Määrä (g)" min="0"></td>
-            <td style="text-align:center;"><input type="checkbox" title="Valmis"></td>
-        `;
-            tbody.appendChild(row);
-        }
-        addRow();
-
-
-        const addRowBtn = document.createElement('button');
-        addRowBtn.type = 'button';
-        addRowBtn.className = 'addRowBtn';
-        addRowBtn.title = 'Lisää rivi';
-        addRowBtn.textContent = '+';
-        addRowBtn.onclick = addRow;
-
-        mealCard.appendChild(table);
-        mealCard.appendChild(addRowBtn);
-
-        return mealCard;
-    }
-
-    document.getElementById('addMealBtn').onclick = function () {
-        document.getElementById('mealsContainer').appendChild(createMealCard());
-    };
-</script>
+<br><br>
+<form method="GET" action="{{ url_for('entry.clear_day_meals') }}">
+    <button type="submit">Tyhjennä päivän ruokailu</button>
+</form>
 {% endblock %}
