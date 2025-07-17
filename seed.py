@@ -193,3 +193,40 @@ def default_gym_entries():
                     value=value
                 ))
             db.session.commit()
+
+# KARDIOMODUULI
+
+def default_cardio_module():
+    existing = Module.query.filter_by(name="kardio").first()
+    if not existing:
+        module = Module(
+            user_id=None,
+            name="kardio",
+            type="yleinen",
+            is_public=True
+        )
+        db.session.add(module)
+        db.session.commit()
+
+def default_cardio_module_fields():
+    module_id = 3  # kardio-moduulin id
+    fields = [
+        {"name": "Laji", "field_type": "text", "formula": None, "order_index": 1},
+        {"name": "Matka", "field_type": "number", "formula": None, "order_index": 2},
+        {"name": "Aika", "field_type": "number", "formula": None, "order_index": 3},
+        {"name": "Tiedot", "field_type": "text", "formula": None, "order_index": 4},
+    ]
+    for field in fields:
+        exists = Module_field.query.filter_by(
+            module_id=module_id,
+            name=field["name"]
+        ).first()
+        if not exists:
+            db.session.add(Module_field(
+                module_id=module_id,
+                name=field["name"],
+                field_type=field["field_type"],
+                formula=field["formula"],
+                order_index=field["order_index"]
+            ))
+    db.session.commit()

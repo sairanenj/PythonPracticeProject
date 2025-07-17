@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Kardiopäiväkirja{% endblock %}
+
+{% block content %}
+<h1>Kardiopäiväkirja</h1>
+
+<form id="cardio-form" method="post" style="margin-bottom: 2em; max-width: 350px;">
+  <div style="display: flex; flex-direction: column; gap: 1em;">
+    <div>
+      <label><input type="radio" name="type" value="Hiihto" required> Hiihto</label><br>
+      <label><input type="radio" name="type" value="Pyöräily"> Pyöräily</label><br>
+      <label><input type="radio" name="type" value="Lenkkeily"> Lenkkeily</label><br>
+      <label><input type="radio" name="type" value="Patikointi"> Patikointi</label>
+    </div>
+    <label>
+      KM: <input type="number" name="km" min="0" step="any" style="width: 100px;">
+    </label>
+    <label>
+      Minuutit: <input type="number" name="minutes" min="0" step="1" style="width: 100px;">
+    </label>
+    <label>
+      Tiedot: <input type="text" name="info" style="width: 100%;">
+    </label>
+    <button type="submit" style="width: auto; padding: 0.4em 1.2em;">Lisää</button>
+  </div>
+</form>
+
+<ul id="cardio-list" style="list-style: none; padding: 0;">
+  {% for entry in entries %}
+  <li
+    style="border: 1px solid #ccc; border-radius: 8px; padding: 0.7em; margin-bottom: 0.7em; display: flex; align-items: center; gap: 1em;">
+    <span>
+      <strong>{{ entry.Laji }}</strong>
+      <span style="color: #888;">| {{ entry.created_at.strftime('%Y-%m-%d') }}</span>
+      | {{ entry.Matka }} km | {{ entry.Aika }} min | {{ entry.Tiedot }}
+    </span>
+    <form method="post" action="{{ url_for('entry.delete_cardio_entry', entry_id=entry.id) }}">
+      <button type="submit"
+        style="margin-left: auto; background: #f66; color: white; border: none; border-radius: 5px; padding: 0.3em 0.7em;">Poista</button>
+    </form>
+  </li>
+  {% else %}
+  <li><em>Ei suorituksia</em></li>
+  {% endfor %}
+</ul>
+
+<div style="margin-top: 1em; font-weight: bold; background: #036100; color: #fff; padding: 0.7em; border-radius: 8px;">
+  Yhteensä: {{ total_km|round(2) }} km | {{ total_min|round(0) }} min
+</div>
+{% endblock %}

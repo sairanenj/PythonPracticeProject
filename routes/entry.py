@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from models import Module_field
 from services.entry_service import (
     add_entry,
     list_entries,
@@ -8,7 +9,10 @@ from services.entry_service import (
     remove_entry,
     list_gym_exercises_by_category,
     add_gym_exercise_to_program,
-    list_gym_program_entries
+    list_gym_program_entries,
+    add_note,
+    add_calculation,
+    add_timer
 )
 from services.module_service import list_fields_for_module, find_module
 
@@ -20,14 +24,14 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "user_id" not in session:
-            return redirect(url_for("auth.kirjaudu"))
+            return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
     return decorated_function
 
 # RUOKAILUREITIT
 
 @entry_bp.route("/eating2", methods=["GET", "POST"])
-#@login_required
+@login_required
 def eating_view():
     module_id = 1  # ruokailumoduulin id
     user_id = session.get("user_id") # dynaaminen käyttäjän id
@@ -69,6 +73,7 @@ def eating_view():
     )
 
 @entry_bp.route("/eating1", methods=["GET", "POST"])
+@login_required
 def eating1_view():
     user_id = session.get("user_id")
     if not user_id:
@@ -130,6 +135,7 @@ def eating1_view():
     )
 
 @entry_bp.route("/clear_day_meals")
+@login_required
 def clear_day_meals():
     session.pop("day_meals", None) # Poistaa päivän ruokailut sessionista
     flash("Päivän ruokailu tyhjennetty.")
@@ -138,6 +144,7 @@ def clear_day_meals():
 # KUNTOSALIREITIT
 
 @entry_bp.route("/gym", methods=["GET"])
+@login_required
 def gym_view():
     gym_module = find_module(2)
     if not gym_module:
@@ -157,6 +164,7 @@ def gym_view():
     )
 
 @entry_bp.route("/add_gym_exercise", methods=["POST"])
+@login_required
 def add_gym_exercise():
     exercise_name = request.form.get("exercise_name")
     category = request.form.get("category")
@@ -184,3 +192,218 @@ def add_gym_exercise():
 
     flash(f"Liike {exercise_name} ({category}) lisätty ohjelmaan!")
     return redirect(url_for("entry.gym_view"))
+
+@entry_bp.route("/edit_gym_entry/<int:entry_id>", methods=["POST"])
+@login_required
+def edit_gym_entry(entry_id):
+    # Hae kentät ja arvot lomakkeesta
+    weight = request.form.get("weight")
+    sets = request.form.get("sets")
+    reps = request.form.get("reps")
+    info = request.form.get("info")
+    # Hae kenttien id:t
+    entry = get_entry(entry_id)
+    if not entry or entry.user_id != session.get("user_id"):
+        flash("Et voi muokata tätä liikettä.")
+        return redirect(url_for("entry.gym_view"))
+    values = get_values(entry_id)
+    field_ids = {Module_field.query.get(v.field_id).name: v.field_id for v in values}
+    # Päivitä kentät
+    edit_entry(entry_id, {
+        field_ids["weight"]: weight,
+        field_ids["sets"]: sets,
+        field_ids["reps"]: reps,
+        field_ids["info"]: info
+    })
+    flash("Liike päivitetty!")
+    return redirect(url_for("entry.gym_view"))
+
+@entry_bp.route("/delete_gym_entry/<int:entry_id>", methods=["POST"])
+@login_required
+def delete_gym_entry(entry_id):
+    entry = get_entry(entry_id)
+    if not entry or entry.user_id != session.get("user_id"):
+        flash("Et voi poistaa tätä liikettä.")
+        return redirect(url_for("entry.gym_view"))
+    remove_entry(entry_id)
+    flash("Liike poistettu ohjelmasta.")
+    return redirect(url_for("entry.gym_view"))
+
+@entry_bp.route("/add_global_gym_exercise", methods=["POST"])
+def add_global_gym_exercise():
+    exercise_name = request.form.get("exercise_name") # Uuden liikkeen nimi
+    category = request.form.get("category") # Kategorian nimi
+    gym_module = find_module(2) # Hae gym-moduuli
+    if not gym_module:
+        flash("Gym module not found.")
+        return redirect(url_for("entry.gym_view"))
+    # Käytetään user_id=999
+    add_gym_exercise_to_program( # Lisää uusi liike yleisiin liikkeisiin
+        module_id=gym_module.id,
+        user_id=999,
+        exercise_name=exercise_name,
+        category=category,
+        weight=0,
+        sets=0,
+        reps=0,
+        info="empty"
+    )
+    flash(f"Liike {exercise_name} lisätty yleisiin liikkeisiin!")
+    return redirect(url_for("entry.gym_view"))
+
+@entry_bp.route("/delete_global_gym_exercise/<int:entry_id>", methods=["POST"])
+@login_required
+def delete_global_gym_exercise(entry_id): # Poistaa yleisen liikkeen
+    entry = get_entry(entry_id) # Hae liike tietokannasta
+    # Vain user_id=999 liikkeet saa poistaa tästä listasta
+    if not entry or entry.user_id != 999: # Tarkista että liike on yleinen
+        flash("Vain yleisiä liikkeitä voi poistaa tästä.")
+        return redirect(url_for("entry.gym_view"))
+    remove_entry(entry_id)
+    flash("Yleinen liike poistettu.")
+    return redirect(url_for("entry.gym_view"))
+
+# KARDIOREITIT
+
+@entry_bp.route("/cardio", methods=["GET", "POST"])
+@login_required
+def cardio_view():
+    module_id = 3  # Kardiomoduulin id
+    user_id = session.get("user_id") # Hae käyttäjän id sessionista
+    fields = list_fields_for_module(module_id) # Hae moduulin kentät
+
+    if request.method == "POST":
+        # Lomakkeelta tiedot
+        laji = request.form.get("type")
+        matka = request.form.get("km")
+        aika = request.form.get("minutes")
+        tiedot = request.form.get("info")
+        # Kenttien id:t
+        field_ids = {f.name: f.id for f in fields} # Hae kenttien id:t sanakirjaan
+        field_value_dict = {
+            field_ids["Laji"]: laji,
+            field_ids["Matka"]: matka,
+            field_ids["Aika"]: aika,
+            field_ids["Tiedot"]: tiedot,
+        }
+        add_entry(module_id, user_id, field_value_dict) # Lisää uusi entry tietokantaan
+        flash("Kardiosuoritus lisätty!")
+        return redirect(url_for("entry.cardio_view"))
+
+    # Listaa käyttäjän entryt
+    entries = list_entries(module_id, user_id) # Hae käyttäjän entryt moduulista
+    entries_with_values = [] # Lista johon tallennetaan entryt ja niiden kenttäarvot
+    for entry in entries: # Käy läpi jokainen entry
+        values = {f.name: "" for f in fields} # Alusta sanakirja kenttien nimillä
+        for v in get_values(entry.id): # Hae entryn kenttäarvot
+            field = next((f for f in fields if f.id == v.field_id), None) # Etsi kenttä id:n perusteella
+            if field:
+                values[field.name] = v.value
+        entries_with_values.append({ # Lisää entry ja sen kenttäarvot listaan
+            "id": entry.id,
+            "created_at": entry.created_at, # Entryn luontiaika
+            **values
+        })
+
+    # Summat
+    total_km = sum(float(e["Matka"] or 0) for e in entries_with_values)
+    total_min = sum(float(e["Aika"] or 0) for e in entries_with_values)
+
+    return render_template(
+        "cardio.html",
+        entries=entries_with_values,
+        total_km=total_km,
+        total_min=total_min
+    )
+
+@entry_bp.route("/delete_cardio_entry/<int:entry_id>", methods=["POST"])
+@login_required
+def delete_cardio_entry(entry_id): # Poistaa kardiomerkinnän
+    entry = get_entry(entry_id) # Hae merkintä tietokannasta
+    user_id = session.get("user_id") # Hae käyttäjän id sessionista
+    if not entry or entry.user_id != user_id: # Varmista että merkintä on käyttäjän oma
+        flash("Et voi poistaa tätä suoritusta.")
+        return redirect(url_for("entry.cardio_view"))
+    remove_entry(entry_id)
+    flash("Suoritus poistettu.")
+    return redirect(url_for("entry.cardio_view"))
+
+# Custom moduulit
+
+@entry_bp.route("/module/<int:module_id>", methods=["GET"])
+@login_required
+def custom_module_view(module_id):
+    module = find_module(module_id)
+    fields = list_fields_for_module(module_id)
+    user_id = session["user_id"]
+    entries = list_entries(module_id, user_id)
+    entries_with_values = []
+    for entry in entries:
+        values_dict = {}
+        for v in get_values(entry.id):
+            values_dict[v.field_id] = v.value
+        entries_with_values.append({
+            "id": entry.id,
+            "created_at": entry.created_at,
+            "values_dict": values_dict
+        })
+    return render_template("custom.html", module=module, fields=fields, entries=entries_with_values)
+
+@entry_bp.route("/module/<int:module_id>/add_note", methods=["POST"])
+@login_required
+def add_note_route(module_id):
+    user_id = session["user_id"]
+    fields = list_fields_for_module(module_id)
+    note_field = next(f for f in fields if f.name == "Muistiinpano")
+    note_text = request.form.get("note")
+    add_note(module_id, user_id, note_field.id, note_text)
+    flash("Muistiinpano lisätty!")
+    return redirect(url_for("entry.custom_module_view", module_id=module_id))
+
+@entry_bp.route("/module/<int:module_id>/add_calculation", methods=["POST"])
+@login_required
+def add_calculation_route(module_id):
+    import re
+
+    user_id = session["user_id"]
+    fields = list_fields_for_module(module_id)
+    calc_field = next(f for f in fields if f.name == "Lasku")
+    result_field = next(f for f in fields if f.name == "Tulos")
+    desc_field = next(f for f in fields if f.name == "Selite")
+    calculation = request.form.get("calculation")
+    description = request.form.get("description")
+
+    # Turvallinen laskutoimitus: sallitaan vain numerot, +, -, *, /, piste ja välilyönti
+    if re.match(r'^[\d\.\+\-\*/\s]+$', calculation):
+        try:
+            result = eval(calculation, {"__builtins__": None}, {})
+        except Exception:
+            result = "Virhe"
+    else:
+        result = "Virhe"
+
+    add_calculation(module_id, user_id, calc_field.id, result_field.id, desc_field.id, calculation, result, description)
+    flash("Lasku tallennettu!")
+    return redirect(url_for("entry.custom_module_view", module_id=module_id))
+
+@entry_bp.route("/module/<int:module_id>/add_timer", methods=["POST"])
+@login_required
+def add_timer_route(module_id):
+    user_id = session["user_id"]
+    fields = list_fields_for_module(module_id)
+    timer_field = next(f for f in fields if f.name == "Aika")
+    desc_field = next(f for f in fields if f.name == "Selite")
+    timer_value = request.form.get("timer_value")
+    description = request.form.get("timer_description")
+    add_timer(module_id, user_id, timer_field.id, desc_field.id, timer_value, description)
+    flash("Aika tallennettu!")
+    return redirect(url_for("entry.custom_module_view", module_id=module_id))
+
+@entry_bp.route("/entry/<int:entry_id>/delete", methods=["POST"])
+@login_required
+def delete_entry_route(entry_id):
+    remove_entry(entry_id)
+    flash("Kirjaus poistettu!")
+    # Ohjataan takaisin samaan moduuliin
+    module_id = request.args.get("module_id")
+    return redirect(url_for("entry.custom_module_view", module_id=module_id))

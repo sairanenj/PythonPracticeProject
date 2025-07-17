@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="fi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}JSHealthPro{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
+
 <body>
     <div class="layout">
         <nav class="sidebar">
@@ -14,21 +16,53 @@
                     JSHealthPro
                 </div>
                 <div class="modules">
-                  {% if session.user_id %}
-                  <a href="{{ url_for('entry.eating1_view') }}">Ruokailu</a>
-                  <a href="{{ url_for('gym') }}">Kuntosali</a>
-                  {% endif %}
+                    {% if session.user_id %}
+                    <a href="{{ url_for('entry.eating1_view') }}">Ruokailu</a>
+                    <a href="{{ url_for('entry.gym_view') }}">Kuntosali</a>
+                    <a href="{{ url_for('entry.cardio_view') }}">Kardio</a>
+                    <div style="margin-top: 2em;">
+                        <div style="display: flex; align-items: center; gap: 0.5em; font-weight: bold;">
+                            Omat avustimet
+                            <form method="post" action="{{ url_for('module.create_custom_module_route') }}"
+                                style="display:inline;">
+                                <button type="submit" style="margin-left: 0.5em;">+</button>
+                            </form>
+                        </div>
+                        <div style="margin-top: 0.7em;">
+                            <div style="display: flex; flex-direction: column; gap: 0.7em;">
+                                {% for custom_module in user_modules %}
+                                <div style="display: flex; align-items: center; gap: 0.5em;">
+                                    <a href="{{ url_for('entry.custom_module_view', module_id=custom_module.id) }}"
+                                        style="text-decoration: none;">
+                                        {{ custom_module.name }}
+                                    </a>
+                                    <form method="post"
+                                        action="{{ url_for('module.delete_custom_module_route', module_id=custom_module.id) }}"
+                                        style="display:inline;">
+                                        <button type="submit"
+                                            style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 0.2em 0.7em; cursor: pointer;">Poista</button>
+                                    </form>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-                {% if session.user_id %}
-                    <form action="{{ url_for('auth.logout') }}" method="post">
-                        <button type="submit" class="logout-btn">Kirjaudu ulos</button>
-                    </form>
-                {% endif %}
+            {% if session.user_id %}
+            <form action="{{ url_for('auth.logout') }}" method="post">
+                <div class="user-info" style="margin-bottom: 0.5em;">
+                    Kirjautuneena: <strong>{{ session.username }}</strong>
+                </div>
+                <button type="submit" class="logout-btn">Kirjaudu ulos</button>
+            </form>
+            {% endif %}
         </nav>
         <main class="content">
             {% block content %}{% endblock %}
         </main>
     </div>
 </body>
+
 </html>

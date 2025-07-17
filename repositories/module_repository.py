@@ -1,4 +1,4 @@
-from models import db, Module, Module_field
+from models import db, Module, Module_field, Entry, Entry_value
 
 # Hae kaikki moduulit (valmiit ja käyttäjän omat)
 def get_modules_for_user(user_id):
@@ -32,6 +32,21 @@ def delete_module(module_id):
         db.session.delete(module)
         db.session.commit()
 
+# Poista moduuli ja siihen liittyvät entryt ja kentät
+def delete_module_and_related(module_id):
+    # Poista kaikki entryt ja entry_valuet
+    entries = Entry.query.filter_by(module_id=module_id).all()
+    for entry in entries:
+        Entry_value.query.filter_by(entry_id=entry.id).delete()
+        db.session.delete(entry)
+    # Poista kaikki kentät
+    Module_field.query.filter_by(module_id=module_id).delete()
+    # Poista moduuli
+    module = Module.query.get(module_id)
+    if module:
+        db.session.delete(module)
+    db.session.commit()
+
 # Hae moduulin kentät järjestyksessä
 def get_fields_for_module(module_id):
     return Module_field.query.filter_by(module_id=module_id).order_by(Module_field.order_index).all()
@@ -55,3 +70,9 @@ def delete_field(field_id):
     if field:
         db.session.delete(field)
         db.session.commit()
+
+def create_custom_module_for_user(user_id, name="Uusi avustin"): # Luo uusi käyttäjän kustomoitava moduuli
+    module = Module(name=name, type="custom", user_id=user_id, is_public=False)
+    db.session.add(module)
+    db.session.commit()
+    return module

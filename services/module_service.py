@@ -7,6 +7,8 @@ from repositories.module_repository import (
     get_fields_for_module,
     add_field_to_module,
     delete_field,
+    create_custom_module_for_user,
+    delete_module_and_related
 )
 
 # Palauta kaikki käyttäjän käytettävissä olevat moduulit
@@ -33,6 +35,10 @@ def edit_module(module_id, **kwargs):
 def remove_module(module_id):
     delete_module(module_id)
 
+# Poistetaan kustomoitu käyttäjän moduuli
+def remove_custom_module(module_id):
+    delete_module_and_related(module_id)
+
 # Palauta moduulin kentät oikeassa järjestyksessä
 def list_fields_for_module(module_id):
     return get_fields_for_module(module_id)
@@ -44,3 +50,14 @@ def add_field(module_id, name, field_type, order_index, formula=None):
 # Poista kenttä moduulista
 def remove_field(field_id):
     delete_field(field_id)
+
+# Luo uusi mukautettava moduuli käyttäjälle
+def create_user_custom_module(user_id, name="Uusi avustin"): 
+    module = create_custom_module_for_user(user_id, name)
+    # Lisää tarvittavat kentät automaattisesti
+    add_field_to_module(module.id, "Muistiinpano", "text", 1)
+    add_field_to_module(module.id, "Lasku", "text", 2)
+    add_field_to_module(module.id, "Tulos", "number", 3)
+    add_field_to_module(module.id, "Selite", "text", 4)
+    add_field_to_module(module.id, "Aika", "number", 5)
+    return module

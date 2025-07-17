@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ module.name }}{% endblock %}
+{% block content %}
+<h2>
+  <form method="post" action="{{ url_for('module.rename_custom_module_route', module_id=module.id) }}" style="display:inline;">
+    <input type="text" name="new_name" value="{{ module.name }}" style="font-size:1.2em; padding:0.2em;">
+    <button type="submit" style="margin-left:0.5em;">Tallenna nimi</button>
+  </form>
+</h2>
+
+<!-- Avustin-napit -->
+<div style="display: flex; gap: 1em; margin-bottom: 2em;">
+  <button onclick="showHelper('note')">Muistiinpano</button>
+  <button onclick="showHelper('calculator')">Laskin</button>
+  <button onclick="showHelper('timer')">Ajanotto</button>
+</div>
+
+<!-- Avustimien lomakkeet (näkyvät vain napin painalluksella) -->
+<div id="note-helper" style="display:none;">
+  <form method="post" action="{{ url_for('entry.add_note_route', module_id=module.id) }}">
+    <input type="text" name="note" placeholder="Kirjoita muistiinpano">
+    <button type="submit">Tallenna</button>
+  </form>
+</div>
+<div id="calculator-helper" style="display:none;">
+  <form method="post" action="{{ url_for('entry.add_calculation_route', module_id=module.id) }}">
+    <input type="text" name="calculation" placeholder="Lasku esim. 2+2">
+    <input type="text" name="description" placeholder="Selite">
+    <button type="submit">Laske ja tallenna</button>
+  </form>
+</div>
+<div id="timer-helper" style="display:none;">
+  <form method="post" action="{{ url_for('entry.add_timer_route', module_id=module.id) }}">
+    <input type="text" name="timer_value" placeholder="Aika sekunteina">
+    <input type="text" name="timer_description" placeholder="Selite">
+    <button type="submit">Tallenna aika</button>
+  </form>
+</div>
+
+<!-- Kaikki kirjaukset listattuna koko ajan -->
+<h3 style="margin-top:2em;">Kaikki kirjaukset</h3>
+<ul>
+  {% set note_field = fields|selectattr('name', 'equalto', 'Muistiinpano')|list %}
+  {% set lasku_field = fields|selectattr('name', 'equalto', 'Lasku')|list %}
+  {% set tulos_field = fields|selectattr('name', 'equalto', 'Tulos')|list %}
+  {% set aika_field = fields|selectattr('name', 'equalto', 'Aika')|list %}
+  {% set selite_field = fields|selectattr('name', 'equalto', 'Selite')|list %}
+  {% if selite_field %}{% set selite_id = selite_field[0].id %}{% endif %}
+  {% if note_field %}{% set note_id = note_field[0].id %}{% endif %}
+  {% if lasku_field %}{% set lasku_id = lasku_field[0].id %}{% endif %}
+  {% if tulos_field %}{% set tulos_id = tulos_field[0].id %}{% endif %}
+  {% if aika_field %}{% set aika_id = aika_field[0].id %}{% endif %}
+
+  {% for entry in entries|sort(attribute='created_at', reverse=True) %}
+  <li>
+    <div style="font-size:0.9em; color:#888;">{{ entry.created_at.strftime('%d.%m.%Y %H:%M') if entry.created_at else '' }}</div>
+    {% if note_field and entry.values_dict[note_id] %}
+      <strong>Muistiinpano:</strong> {{ entry.values_dict[note_id] }}
+    {% endif %}
+    {% if lasku_field and tulos_field and entry.values_dict[lasku_id] %}
+      <strong>Lasku:</strong> {{ entry.values_dict[lasku_id] }} = {{ entry.values_dict[tulos_id] }}
+      {% if selite_field and entry.values_dict[selite_id] %}
+        ({{ entry.values_dict[selite_id] }})
+      {% endif %}
+    {% endif %}
+    {% if aika_field and entry.values_dict[aika_id] %}
+      <strong>Ajanotto:</strong> {{ entry.values_dict[aika_id] }} sek
+      {% if selite_field and entry.values_dict[selite_id] %}
+        ({{ entry.values_dict[selite_id] }})
+      {% endif %}
+    {% endif %}
+    <form method="post" action="{{ url_for('entry.delete_entry_route', entry_id=entry.id, module_id=module.id) }}" style="display:inline;">
+      <button type="submit" style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 0.2em 0.7em; cursor: pointer; margin-left: 1em;">Poista</button>
+    </form>
+  </li>
+{% endfor %}
+</ul>
+
+<script>
+  function showHelper(helper) {
+    document.getElementById('note-helper').style.display = 'none';
+    document.getElementById('calculator-helper').style.display = 'none';
+    document.getElementById('timer-helper').style.display = 'none';
+    document.getElementById(helper + '-helper').style.display = 'block';
+  }
+</script>
+{% endblock %}

@@ -8,7 +8,10 @@ from repositories.entry_repository import (
     get_name_field_for_category,
     get_exercise_names_for_field,
     create_gym_entry,
-    get_gym_program_entries
+    get_gym_program_entries,
+    add_note_entry,
+    add_calculation_entry,
+    add_timer_entry
 )
 
 # Lisää uusi merkintä moduuliin
@@ -51,3 +54,14 @@ def add_gym_exercise_to_program(module_id, user_id, exercise_name, category, wei
 
 def list_gym_program_entries(module_id, user_id):
     return get_gym_program_entries(module_id, user_id)
+
+# Kustomoitu moduuli
+
+def add_note(module_id, user_id, note_field_id, note_text):
+    return add_note_entry(module_id, user_id, note_field_id, note_text)
+
+def add_calculation(module_id, user_id, calc_field_id, result_field_id, desc_field_id, calculation, result, description):
+    return add_calculation_entry(module_id, user_id, calc_field_id, result_field_id, desc_field_id, calculation, result, description)
+
+def add_timer(module_id, user_id, timer_field_id, desc_field_id, timer_value, description):
+    return add_timer_entry(module_id, user_id, timer_field_id, desc_field_id, timer_value, description)

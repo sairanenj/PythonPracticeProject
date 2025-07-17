@@ -12,22 +12,26 @@
     <ol style="list-style: none; padding: 0;">
       {% for entry in gym_program %}
       <li style="border: 1px solid #ccc; border-radius: 10px; padding: 1rem; margin-bottom: 1rem; background: #fafbfc;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <strong>{{ entry.name }} ({{ entry.category|capitalize }})</strong>
-          <button type="button">Poista ohjelmasta</button>
-        </div>
-        <div style="margin-top: 0.5rem;">
-          <label>Paino: <input type="number" value="{{ entry.weight }}" min="0" step="any" style="width:60px;"
-              disabled></label>
-          <label>Sarjat: <input type="number" value="{{ entry.sets }}" min="1" step="1" style="width:40px;"
-              disabled></label>
-          <label>Toistot: <input type="number" value="{{ entry.reps }}" min="1" step="1" style="width:40px;"
-              disabled></label>
-        </div>
-        <div style="margin-top: 0.5rem;">
-          <label>Muistiinpanot: <input type="text" value="{{ entry.info }}" style="width: 200px;" disabled></label>
-          <button type="button" style="margin-left: 10px;" disabled>Tallenna</button>
-        </div>
+        <form method="post" action="{{ url_for('entry.edit_gym_entry', entry_id=entry.id) }}">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <strong>{{ entry.name }} ({{ entry.category|capitalize }})</strong>
+            <button type="submit" formaction="{{ url_for('entry.delete_gym_entry', entry_id=entry.id) }}"
+              formmethod="post"
+              style="background: #f66; color: white; border: none; border-radius: 5px; padding: 0.3em 0.7em;">Poista</button>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <label>Paino: <input type="number" name="weight" value="{{ entry.weight }}" min="0" step="any"
+                style="width:60px;"></label>
+            <label>Sarjat: <input type="number" name="sets" value="{{ entry.sets }}" min="0" step="1"
+                style="width:40px;"></label>
+            <label>Toistot: <input type="number" name="reps" value="{{ entry.reps }}" min="0" step="1"
+                style="width:40px;"></label>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <label>Muistiinpanot: <input type="text" name="info" value="{{ entry.info }}" style="width: 200px;"></label>
+            <button type="submit" style="margin-left: 10px;">Tallenna</button>
+          </div>
+        </form>
       </li>
       {% else %}
       <li><em>Ei liikkeitä ohjelmassa</em></li>
@@ -40,20 +44,29 @@
     <div>
       <h3 style="display: flex; align-items: center; gap: 0.5rem;">
         {{ category|capitalize }}
-        <button type="button">Lisää</button>
+        <form method="post" action="{{ url_for('entry.add_global_gym_exercise') }}"
+          style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="hidden" name="category" value="{{ category }}">
+          <input type="text" name="exercise_name" placeholder="Uusi liike..." required style="width: 120px;">
+          <button type="submit">Lisää</button>
+        </form>
       </h3>
       <ul>
         {% for exercise in exercises %}
-        <li>
+        <li style="display: flex; align-items: center; gap: 0.5rem;">
           <form method="post" action="{{ url_for('entry.add_gym_exercise') }}" style="display:inline;">
-            {{ exercise }}
-            <input type="hidden" name="exercise_name" value="{{ exercise }}">
+            {{ exercise.name }}
+            <input type="hidden" name="exercise_name" value="{{ exercise.name }}">
             <input type="hidden" name="category" value="{{ category }}">
             <input type="hidden" name="weight" value="0">
             <input type="hidden" name="sets" value="0">
             <input type="hidden" name="reps" value="0">
             <input type="hidden" name="info" value="empty">
-            <button type="submit" style="margin-left: 0.5rem;">+</button>
+            <button type="submit" style="margin-left: 0.5rem; color: green; font-weight: bold;">+</button>
+          </form>
+          <form method="post" action="{{ url_for('entry.delete_global_gym_exercise', entry_id=exercise.id) }}"
+            style="display:inline;">
+            <button type="submit" style="margin-left: 0.2rem; color: red; font-weight: bold;">-</button>
           </form>
         </li>
         {% else %}

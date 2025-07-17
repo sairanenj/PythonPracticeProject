@@ -41,7 +41,9 @@ def update_entry_values(entry_id, field_value_dict):
 # Poista merkintä ja siihen liittyvät arvot
 def delete_entry(entry_id):
     Entry_value.query.filter_by(entry_id=entry_id).delete()
-    Entry.query.filter_by(id=entry_id).delete()
+    entry = Entry.query.filter_by(id=entry_id).first()
+    if entry:
+        db.session.delete(entry)
     db.session.commit()
 
 def get_name_field_for_category(module_id, category): # Haetaan kategorian nimi kentälle
@@ -50,14 +52,13 @@ def get_name_field_for_category(module_id, category): # Haetaan kategorian nimi 
 
 def get_exercise_names_for_field(field_id, user_id):
     from models import Entry_value, Entry
-    # Hae vain ne Entry_value:t, joiden entry kuuluu user_id:lle
     values = (
         Entry_value.query
         .join(Entry)
         .filter(Entry_value.field_id == field_id, Entry.user_id == user_id)
         .all()
     )
-    return [v.value for v in values]
+    return [{"name": v.value, "id": v.entry_id} for v in values]
 
 def create_gym_entry(module_id, user_id, exercise_name, category, weight, sets, reps, info):
     # Luo uusi Entry
@@ -97,5 +98,35 @@ def get_gym_program_entries(module_id, user_id):
             field = Module_field.query.get(v.field_id)
             value_dict[field.name] = v.value
             value_dict["category"] = field.category  # Tarvitaan otsikkoon
+        value_dict["id"] = entry.id  # Lisää entry id
         result.append(value_dict)
     return result
+
+# Kustomoitava moduuli
+
+def add_note_entry(module_id, user_id, note_field_id, note_text):
+    entry = Entry(module_id=module_id, user_id=user_id)
+    db.session.add(entry)
+    db.session.commit()
+    db.session.add(Entry_value(entry_id=entry.id, field_id=note_field_id, value=note_text))
+    db.session.commit()
+    return entry
+
+def add_calculation_entry(module_id, user_id, calc_field_id, result_field_id, desc_field_id, calculation, result, description):
+    entry = Entry(module_id=module_id, user_id=user_id)
+    db.session.add(entry)
+    db.session.commit()
+    db.session.add(Entry_value(entry_id=entry.id, field_id=calc_field_id, value=calculation))
+    db.session.add(Entry_value(entry_id=entry.id, field_id=result_field_id, value=str(result)))
+    db.session.add(Entry_value(entry_id=entry.id, field_id=desc_field_id, value=description))
+    db.session.commit()
+    return entry
+
+def add_timer_entry(module_id, user_id, timer_field_id, desc_field_id, timer_value, description):
+    entry = Entry(module_id=module_id, user_id=user_id)
+    db.session.add(entry)
+    db.session.commit()
+    db.session.add(Entry_value(entry_id=entry.id, field_id=timer_field_id, value=str(timer_value)))
+    db.session.add(Entry_value(entry_id=entry.id, field_id=desc_field_id, value=description))
+    db.session.commit()
+    return entry
