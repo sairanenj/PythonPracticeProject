@@ -35,8 +35,7 @@
       | {{ entry.Matka }} km | {{ entry.Aika }} min | {{ entry.Tiedot }}
     </span>
     <form method="post" action="{{ url_for('entry.delete_cardio_entry', entry_id=entry.id) }}">
-      <button type="submit"
-        style="margin-left: auto; background: #f66; color: white; border: none; border-radius: 5px; padding: 0.3em 0.7em;">Poista</button>
+      <button type="submit" class="delete-btn" style="margin-left: auto; padding: 0.3em 0.7em;">Poista</button>
     </form>
   </li>
   {% else %}

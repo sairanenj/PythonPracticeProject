@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}JSHealthPro{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -13,7 +14,9 @@
         <nav class="sidebar">
             <div class="top">
                 <div class="logo">
-                    JSHealthPro
+                    <a href="{{ url_for('start') }}" style="text-decoration: none; color: inherit;">
+                        JSHealthPro
+                    </a>
                 </div>
                 <div class="modules">
                     {% if session.user_id %}
@@ -39,8 +42,7 @@
                                     <form method="post"
                                         action="{{ url_for('module.delete_custom_module_route', module_id=custom_module.id) }}"
                                         style="display:inline;">
-                                        <button type="submit"
-                                            style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 0.2em 0.7em; cursor: pointer;">Poista</button>
+                                        <button type="submit" class="delete-btn">Poista</button>
                                     </form>
                                 </div>
                                 {% endfor %}

@@ -139,7 +139,7 @@ def eating1_view():
 def clear_day_meals():
     session.pop("day_meals", None) # Poistaa päivän ruokailut sessionista
     flash("Päivän ruokailu tyhjennetty.")
-    return redirect(url_for("eating1"))
+    return redirect(url_for("entry.eating1_view"))
 
 # KUNTOSALIREITIT
 

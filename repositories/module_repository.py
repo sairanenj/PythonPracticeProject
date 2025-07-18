@@ -72,7 +72,7 @@ def delete_field(field_id):
         db.session.commit()
 
 def create_custom_module_for_user(user_id, name="Uusi avustin"): # Luo uusi käyttäjän kustomoitava moduuli
-    module = Module(name=name, type="custom", user_id=user_id, is_public=False)
+    module = Module(name=name, type="custom", user_id=user_id, is_public=False) # Luo uusi moduuli
     db.session.add(module)
     db.session.commit()
     return module

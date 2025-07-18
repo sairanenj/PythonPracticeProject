@@ -3,16 +3,19 @@
 {% block title %}Kirjaudu sisään - JSHealthPro{% endblock %}
 
 {% block content %}
-    <h1>Kirjaudu sisään</h1>
+    <h1 style="color:#00ff87; letter-spacing:2px;">Kirjaudu sisään</h1>
     {% if message %}
-        <div style="color: red;">{{ message }}</div>
+        <div style="color: #ff3c6f; font-weight: bold; margin-bottom: 1em;">{{ message }}</div>
     {% endif %}
-    <form method="post">
-        <label for="username">Käyttäjätunnus:</label><br>
+    <form method="post" style="max-width: 350px; margin: 0 auto; background: rgba(0,255,135,0.07); border-radius: 12px; padding: 2em; box-shadow: 0 2px 16px rgba(0,255,135,0.04);">
+        <label for="username">Käyttäjätunnus</label><br>
         <input type="text" id="username" name="username" required><br><br>
-        <label for="password">Salasana:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
+        <label for="password">Salasana</label><br>
+        <input type="password" id="password" name="password" required autocomplete="current-password"><br><br>
         <button type="submit">Kirjaudu</button>
     </form>
-    <p>Ei vielä tiliä? <a href="{{ url_for('auth.register') }}">Rekisteröidy</a></p>
+    <p style="text-align:center; margin-top:1.5em;">
+        <span style="color:#eaf6fb;">Ei vielä tiliä?</span>
+        <a href="{{ url_for('auth.register') }}" style="color:#00ff87; font-weight:bold;">Rekisteröidy</a>
+    </p>
 {% endblock %}

@@ -49,13 +49,13 @@
         {% endfor %}
     </tbody>
     <tfoot>
-        <tr style="background: #e0e0e0; font-weight: bold;">
+        <tr style="font-weight: bold;">
             <th>Yhteensä</th>
-            <td>{{ total_amount }}</td>
-            <td style="background: #ffe066;">{{ total_fat|round(2) }}</td>
-            <td style="background: #b6fcb6;">{{ total_protein|round(2) }}</td>
-            <td style="background: #ffd6d6;">{{ total_carb|round(2) }}</td>
-            <td style="background: #d6f0ff;">{{ total_energy|round(1) }}</td>
+            <td style="background: #4f0063;">{{ total_amount }}</td>
+            <td style="background: #413400;">{{ total_fat|round(2) }}</td>
+            <td style="background: #005f00;">{{ total_protein|round(2) }}</td>
+            <td style="background: #640000;">{{ total_carb|round(2) }}</td>
+            <td style="background: #003f63;">{{ total_energy|round(1) }}</td>
             <td></td>
         </tr>
     </tfoot>

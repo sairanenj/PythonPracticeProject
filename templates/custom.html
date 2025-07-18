@@ -70,7 +70,7 @@
       {% endif %}
     {% endif %}
     <form method="post" action="{{ url_for('entry.delete_entry_route', entry_id=entry.id, module_id=module.id) }}" style="display:inline;">
-      <button type="submit" style="background: #e74c3c; color: white; border: none; border-radius: 3px; padding: 0.2em 0.7em; cursor: pointer; margin-left: 1em;">Poista</button>
+      <button type="submit" class="delete-btn" style="margin-left: 1em;">Poista</button>
     </form>
   </li>
 {% endfor %}

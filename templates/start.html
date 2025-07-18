@@ -3,9 +3,11 @@
 {% block title %}Tervetuloa - JSHealthPro{% endblock %}
 
 {% block content %}
-    <h1>Tervetuloa JSHealthPro-sovellukseen!</h1>
-    <p>
-        <a href="{{ url_for('auth.login') }}">Kirjaudu sisään</a> |
-        <a href="{{ url_for('auth.register') }}">Rekisteröidy</a>
-    </p>
+    <h1 style="color:#00ff87; letter-spacing:2px;">Tervetuloa JSHealthPro-sovellukseen!</h1>
+    {% if not session.user_id %}
+    <div style="margin:2em 0; text-align:center;">
+        <a href="{{ url_for('auth.login') }}" style="margin-right:1em; background: linear-gradient(90deg, #00ff87 0%, #60efff 100%); color:#181f26; font-weight:bold; border-radius:6px; padding:0.7em 1.5em; text-decoration:none; box-shadow:0 2px 8px rgba(0,255,135,0.08);">Kirjaudu sisään</a>
+        <a href="{{ url_for('auth.register') }}" style="background: linear-gradient(90deg, #60efff 0%, #00ff87 100%); color:#181f26; font-weight:bold; border-radius:6px; padding:0.7em 1.5em; text-decoration:none; box-shadow:0 2px 8px rgba(0,255,135,0.08);">Rekisteröidy</a>
+    </div>
+    {% endif %}
 {% endblock %}
